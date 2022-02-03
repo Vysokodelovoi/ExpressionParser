@@ -21,8 +21,46 @@ public class UnaryMinus extends MyExpression {
 
     @Override
     protected void fillToString(StringBuilder stringBuilder) {
-        stringBuilder.append("-");
+        stringBuilder.append("-(");
         subExpression.fillToString(stringBuilder);
+        stringBuilder.append(")");
+    }
+
+    @Override
+    public String toString() {
+        return "-(" + subExpression.toString() + ")";
+    }
+
+    @Override
+    public String toMiniString() {
+        if (subExpression instanceof Variable || subExpression instanceof Const
+                || subExpression instanceof UnaryMinus) {
+            return "- "+subExpression.toMiniString();
+        }
+        return "-(" + subExpression.toMiniString() + ")";
+    }
+
+    @Override
+    protected void fillMiniString(StringBuilder stringBuilder, PairMyExpression parent) {
+        if (subExpression instanceof Variable || subExpression instanceof Const
+                || subExpression instanceof UnaryMinus) {
+            stringBuilder.append("- ");
+            subExpression.fillMiniString(stringBuilder, parent);
+        } else {
+            stringBuilder.append("-(");
+            subExpression.fillMiniString(stringBuilder, parent);
+            stringBuilder.append(")");
+        }
+    }
+
+    @Override
+    protected void fillAsFirst(StringBuilder stringBuilder, PairMyExpression parent) {
+        fillMiniString(stringBuilder, parent);
+    }
+
+    @Override
+    protected void fillAsSecond(StringBuilder stringBuilder, PairMyExpression parent) {
+        fillMiniString(stringBuilder, parent);
     }
 
     @Override

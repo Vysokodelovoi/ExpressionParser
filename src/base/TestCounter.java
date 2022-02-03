@@ -21,6 +21,8 @@ import java.util.jar.JarFile;
  */
 public class TestCounter extends Log {
     public static final int DENOMINATOR = Integer.getInteger("base.denominator", 1);
+    public static final int DENOMINATOR2 = (int) Math.round(Math.sqrt(DENOMINATOR));
+
     private final Class<?> owner;
     private final Map<String, ?> properties;
 

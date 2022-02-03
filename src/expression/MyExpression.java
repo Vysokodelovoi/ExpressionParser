@@ -22,6 +22,13 @@ public abstract class MyExpression implements Expression, TripleExpression, BigI
         return toString();
     }
 
+//    @Override
+//    public String toString() {
+//        StringBuilder sb = new StringBuilder();
+//        fillToString(sb);
+//        return sb.toString();
+//    }
+
     protected abstract void fillToString(StringBuilder stringBuilder);
 
     protected void fillMiniString(StringBuilder stringBuilder, PairMyExpression parent) {

@@ -58,10 +58,9 @@ public class BaseParser {
         return from <= ch && ch <= to;
     }
 
-
     protected void skipWhitespace() {
-        while (take(' ') || take('\r') || take('\n') || take('\t')) {
-            // skip
+        while (Character.isWhitespace(ch)) {
+            take();
         }
     }
 }

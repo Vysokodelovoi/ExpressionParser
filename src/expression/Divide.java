@@ -11,6 +11,9 @@ public class Divide extends PairMyExpression {
 
     @Override
     protected int pairExpressionEval(int firstResult, int secondResult) {
+        if (secondResult == 0) {
+            throw new ArithmeticException("Division by zero");
+        }
         return firstResult / secondResult;
     }
 
