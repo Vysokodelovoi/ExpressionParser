@@ -8,8 +8,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class ExpressionParser extends BaseParser implements Parser {
-    private Set<Character> operatorSymbols = Set.of('+', '-', '*', '/');
-    private Set<String> operators = Set.of("+", "-", "*", "/");
+    private final Set<Character> operatorSymbols = Set.of('+', '-', '*', '/');
+    private final Set<String> operators = Set.of("+", "-", "*", "/");
 
     public ExpressionParser() {
         super();
@@ -24,6 +24,7 @@ public class ExpressionParser extends BaseParser implements Parser {
         initialize(new StringSource(s));
         return parseExpression();
     }
+
     private MyExpression parseExpression() {
         MyExpression first, second;
         first = parseAddTerm();

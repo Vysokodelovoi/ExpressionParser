@@ -5,8 +5,31 @@ import java.util.Objects;
 
 public abstract class PairMyExpression extends MyExpression {
     protected final MyExpression e1, e2;
-    protected String operator;
+    public final static PairMyExpression nullPriorityExpression =
+            new PairMyExpression(null, null) {
+        @Override
+        public Priority getPriority() {
+            return Priority.ADD;
+        }
 
+        @Override
+        protected String getOperator() {
+            return "+";
+        }
+
+        @Override
+        protected int pairExpressionEval(int firstResult, int secondResult) {
+            return 0;
+        }
+
+        @Override
+        protected BigInteger pairExpressionEval(BigInteger firstResult, BigInteger secondResult) {
+            return null;
+        }
+    };
+
+
+    protected abstract String getOperator();
     protected abstract int pairExpressionEval(int firstResult, int secondResult);
 
     protected abstract BigInteger pairExpressionEval(BigInteger firstResult, BigInteger secondResult);
@@ -34,28 +57,29 @@ public abstract class PairMyExpression extends MyExpression {
     protected void fillToString(StringBuilder stringBuilder) {
         stringBuilder.append("(");
         e1.fillToString(stringBuilder);
-        stringBuilder.append(" ").append(operator).append(" ");
+        stringBuilder.append(" ").append(getOperator()).append(" ");
         e2.fillToString(stringBuilder);
         stringBuilder.append(")");
     }
 
     @Override
     protected void fillMiniString(StringBuilder stringBuilder, PairMyExpression parent) {
-        e1.fillAsFirst(stringBuilder, parent);
-        stringBuilder.append(" ").append(operator).append(" ");
-        e2.fillAsSecond(stringBuilder, parent);
+        e1.fillAsFirst(stringBuilder, this);
+        stringBuilder.append(" ").append(getOperator()).append(" ");
+        e2.fillAsSecond(stringBuilder, this);
     }
 
     protected void fillAsFirst(StringBuilder stringBuilder, PairMyExpression parent) {
-        boolean needParenthesis = priorities.get(parent.prior) > priorities.get(prior);
+        boolean needParenthesis = priorities.get(parent.getPriority()) > priorities.get(getPriority());
         decorate(stringBuilder, needParenthesis);
     }
 
     protected void fillAsSecond(StringBuilder stringBuilder, PairMyExpression parent) {
-        boolean needParenthesis = priorities.get(parent.prior) > priorities.get(prior);
-        needParenthesis = needParenthesis || (parent.operator.equals(operator)
-                && !associative.get(operator)) || (prior == parent.prior
-                && !operator.equals(parent.operator)
+        String operator = getOperator();
+        boolean needParenthesis = priorities.get(parent.getPriority()) > priorities.get(getPriority());
+        needParenthesis = needParenthesis || (parent.getOperator().equals(operator)
+                && !associative.get(operator)) || (getPriority() == parent.getPriority()
+                && !operator.equals(parent.getOperator())
                 && !operator.equals("-"));
         decorate(stringBuilder, needParenthesis);
     }
@@ -91,11 +115,11 @@ public abstract class PairMyExpression extends MyExpression {
             return false;
         }
         PairMyExpression exp = (PairMyExpression) obj;
-        return operator.equals(exp.operator) && e1.equals(exp.e1) && e2.equals(exp.e2);
+        return getOperator().equals(exp.getOperator()) && e1.equals(exp.e1) && e2.equals(exp.e2);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(e1, e2, operator);
+        return Objects.hash(e1, e2, getOperator());
     }
 }

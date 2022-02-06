@@ -32,6 +32,11 @@ public class UnaryMinus extends MyExpression {
     }
 
     @Override
+    protected Priority getPriority() {
+        return Priority.CONSTANT;
+    }
+
+    @Override
     public String toMiniString() {
         if (subExpression instanceof Variable || subExpression instanceof Const
                 || subExpression instanceof UnaryMinus) {
@@ -45,22 +50,28 @@ public class UnaryMinus extends MyExpression {
         if (subExpression instanceof Variable || subExpression instanceof Const
                 || subExpression instanceof UnaryMinus) {
             stringBuilder.append("- ");
-            subExpression.fillMiniString(stringBuilder, parent);
+//            subExpression.fillMiniString(stringBuilder, parent);
+            subExpression.fillMiniString(stringBuilder, PairMyExpression.nullPriorityExpression);
+
         } else {
             stringBuilder.append("-(");
-            subExpression.fillMiniString(stringBuilder, parent);
+            subExpression.fillMiniString(stringBuilder, PairMyExpression.nullPriorityExpression);
             stringBuilder.append(")");
         }
     }
 
     @Override
     protected void fillAsFirst(StringBuilder stringBuilder, PairMyExpression parent) {
-        fillMiniString(stringBuilder, parent);
+        if (subExpression instanceof PairMyExpression) {
+            fillMiniString(stringBuilder, (PairMyExpression) subExpression);
+        } else {
+            fillMiniString(stringBuilder, PairMyExpression.nullPriorityExpression);
+        }
     }
 
     @Override
     protected void fillAsSecond(StringBuilder stringBuilder, PairMyExpression parent) {
-        fillMiniString(stringBuilder, parent);
+        fillAsFirst(stringBuilder, parent);
     }
 
     @Override

@@ -5,8 +5,16 @@ import java.math.BigInteger;
 public class Subtract extends PairMyExpression {
     public Subtract(MyExpression e1, MyExpression e2) {
         super(e1, e2);
-        prior = Priority.ADD;
-        operator = "-";
+    }
+
+    @Override
+    protected Priority getPriority() {
+        return Priority.ADD;
+    }
+
+    @Override
+    protected String getOperator() {
+        return "-";
     }
 
     @Override

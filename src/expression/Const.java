@@ -7,15 +7,18 @@ public class Const extends MyExpression {
     private final BigInteger bigSelf;
 
     public Const(int constant) {
-        prior = Priority.CONSTANT;
         self = constant;
         bigSelf = null;
     }
 
     public Const(BigInteger bigInteger) {
-        prior = Priority.CONSTANT;
         bigSelf = bigInteger;
         self = 0;
+    }
+
+    @Override
+    protected Priority getPriority() {
+        return Priority.CONSTANT;
     }
 
     @Override

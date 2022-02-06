@@ -7,13 +7,17 @@ public class Variable extends MyExpression {
 
     public Variable(String name) {
         this.name = name;
-        prior = Priority.VARIABLE;
     }
 
     void checkName() {
         if (!name.equals("x")) {
             throw new UnsupportedOperationException("Unable to evaluate variable " + name);
         }
+    }
+
+    @Override
+    protected Priority getPriority() {
+        return Priority.VARIABLE;
     }
 
     @Override

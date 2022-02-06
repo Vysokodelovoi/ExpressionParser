@@ -15,7 +15,7 @@ public abstract class MyExpression implements Expression, TripleExpression, BigI
             "*", true,
             "/", false
     );
-    protected Priority prior;
+    protected abstract Priority getPriority();
 
     @Override
     public String toMiniString() {

@@ -5,8 +5,16 @@ import java.math.BigInteger;
 public class Divide extends PairMyExpression {
     public Divide(MyExpression e1, MyExpression e2) {
         super(e1, e2);
-        prior = Priority.MULTIPLY;
-        operator = "/";
+    }
+
+    @Override
+    protected Priority getPriority() {
+        return Priority.MULTIPLY;
+    }
+
+    @Override
+    protected String getOperator() {
+        return "/";
     }
 
     @Override

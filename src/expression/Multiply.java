@@ -6,8 +6,11 @@ public class Multiply extends PairMyExpression {
 
     public Multiply(MyExpression e1, MyExpression e2) {
         super(e1, e2);
-        prior = Priority.MULTIPLY;
-        operator = "*";
+    }
+
+    @Override
+    protected String getOperator() {
+        return "*";
     }
 
     @Override
@@ -18,5 +21,10 @@ public class Multiply extends PairMyExpression {
     @Override
     protected BigInteger pairExpressionEval(BigInteger firstResult, BigInteger secondResult) {
         return firstResult.multiply(secondResult);
+    }
+
+    @Override
+    protected Priority getPriority() {
+        return Priority.MULTIPLY;
     }
 }
