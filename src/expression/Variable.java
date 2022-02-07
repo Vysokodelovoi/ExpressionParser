@@ -9,12 +9,6 @@ public class Variable extends MyExpression {
         this.name = name;
     }
 
-    void checkName() {
-        if (!name.equals("x")) {
-            throw new UnsupportedOperationException("Unable to evaluate variable " + name);
-        }
-    }
-
     @Override
     protected Priority getPriority() {
         return Priority.VARIABLE;
@@ -50,13 +44,11 @@ public class Variable extends MyExpression {
 
     @Override
     public BigInteger evaluate(BigInteger x) {
-        checkName();
         return x;
     }
 
     @Override
     public int evaluate(int value) {
-        checkName();
         return value;
     }
 

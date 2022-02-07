@@ -2,29 +2,29 @@ package expression;
 
 import java.math.BigInteger;
 
-public class UnaryMinus extends UnaryExpression {
+public class Notz extends UnaryExpression {
 
-    public UnaryMinus(MyExpression subExpression) {
+    public Notz(MyExpression subExpression) {
         super(subExpression);
     }
 
     @Override
     public BigInteger evaluate(BigInteger x) {
-        return subExpression.evaluate(x).negate();
+        return null;
     }
 
     @Override
     public int evaluate(int x) {
-        return -subExpression.evaluate(x);
+        return Integer.numberOfTrailingZeros(subExpression.evaluate(x));
     }
 
     @Override
     public int evaluate(int x, int y, int z) {
-        return -subExpression.evaluate(x, y, z);
+        return Integer.numberOfTrailingZeros(subExpression.evaluate(x, y, z));
     }
 
     @Override
     String getOperator() {
-        return "-";
+        return "t0";
     }
 }
