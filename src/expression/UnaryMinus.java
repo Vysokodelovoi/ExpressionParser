@@ -12,19 +12,13 @@ public class UnaryMinus extends UnaryExpression {
     public BigInteger evaluate(BigInteger x) {
         return subExpression.evaluate(x).negate();
     }
-
     @Override
-    public int evaluate(int x) {
-        return -subExpression.evaluate(x);
+    protected int unaryExpressionEval(int exprResult) {
+        return -exprResult;
     }
 
     @Override
-    public int evaluate(int x, int y, int z) {
-        return -subExpression.evaluate(x, y, z);
-    }
-
-    @Override
-    String getOperator() {
+    protected String getOperator() {
         return "-";
     }
 }

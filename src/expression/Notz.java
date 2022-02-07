@@ -9,22 +9,17 @@ public class Notz extends UnaryExpression {
     }
 
     @Override
+    protected String getOperator() {
+        return "t0";
+    }
+
+    @Override
+    protected int unaryExpressionEval(int exprResult) {
+        return Integer.numberOfTrailingZeros(exprResult);
+    }
+
+    @Override
     public BigInteger evaluate(BigInteger x) {
         return null;
-    }
-
-    @Override
-    public int evaluate(int x) {
-        return Integer.numberOfTrailingZeros(subExpression.evaluate(x));
-    }
-
-    @Override
-    public int evaluate(int x, int y, int z) {
-        return Integer.numberOfTrailingZeros(subExpression.evaluate(x, y, z));
-    }
-
-    @Override
-    String getOperator() {
-        return "t0";
     }
 }

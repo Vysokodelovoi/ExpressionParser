@@ -1,13 +1,13 @@
 package expression;
 
 public abstract class UnaryExpression extends MyExpression {
-    MyExpression subExpression;
+    protected MyExpression subExpression;
 
     public UnaryExpression(MyExpression subExpression) {
         this.subExpression = subExpression;
     }
 
-    abstract String getOperator();
+    protected abstract String getOperator();
     @Override
     protected void fillToString(StringBuilder stringBuilder) {
         stringBuilder.append(getOperator()).append("(");
@@ -62,4 +62,16 @@ public abstract class UnaryExpression extends MyExpression {
     protected void fillAsSecond(StringBuilder stringBuilder, PairMyExpression parent) {
         fillAsFirst(stringBuilder, parent);
     }
+
+    @Override
+    public int evaluate(int x) {
+        return unaryExpressionEval(subExpression.evaluate(x));
+    }
+
+    @Override
+    public int evaluate(int x, int y, int z) {
+        return unaryExpressionEval(subExpression.evaluate(x, y, z));
+    }
+
+    protected abstract int unaryExpressionEval(int exprResult);
 }

@@ -1,6 +1,7 @@
-package expression.parser;
-import info.kgeorgiy.json.BaseParser;
+package expression.exceptions;
+
 import expression.*;
+import info.kgeorgiy.json.BaseParser;
 import info.kgeorgiy.json.CharSource;
 import info.kgeorgiy.json.StringSource;
 
@@ -51,7 +52,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             if (between('0', '9')) {
                 firstTerm = parseConst(true);
             } else {
-                firstTerm = new UnaryMinus(parseTerm(3));
+                firstTerm = new CheckedNegate(parseTerm(3));
             }
         } else if (ch == 'l' || ch == 't') {
           firstTerm = makeUnaryExpression(parseUnaryOperator(), parseTerm(3));
@@ -71,10 +72,10 @@ public class ExpressionParser extends BaseParser implements Parser {
 
     private MyExpression makeBinaryExpression(MyExpression firstExpression, MyExpression secondExpression, String curOperation) {
         return switch (curOperation) {
-            case "+" -> new Add(firstExpression, secondExpression);
-            case "-" -> new Subtract(firstExpression, secondExpression);
-            case "*" -> new Multiply(firstExpression, secondExpression);
-            case "/" -> new Divide(firstExpression, secondExpression);
+            case "+" -> new CheckedAdd(firstExpression, secondExpression);
+            case "-" -> new CheckedSubtract(firstExpression, secondExpression);
+            case "*" -> new CheckedMultiply(firstExpression, secondExpression);
+            case "/" -> new CheckedDivide(firstExpression, secondExpression);
             case "max" -> new Maximum(firstExpression, secondExpression);
             case "min" -> new Minimum(firstExpression, secondExpression);
             default -> throw new NoSuchElementException("Cannot resolve operation " + curOperation);
@@ -90,8 +91,7 @@ public class ExpressionParser extends BaseParser implements Parser {
     }
 
     private String parseBinaryOperator() {
-        String op = parseFromSet(binaryOperatorSymbols, binaryOperators);
-        return  op;
+        return parseFromSet(binaryOperatorSymbols, binaryOperators);
     }
 
     private  String parseUnaryOperator() {
