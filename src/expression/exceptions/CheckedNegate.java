@@ -1,12 +1,11 @@
 package expression.exceptions;
 
 import expression.MyExpression;
-import expression.UnaryExpression;
-import expression.UnaryMinus;
+import expression.Negate;
 
 import java.math.BigInteger;
 
-public class CheckedNegate extends UnaryMinus {
+public class CheckedNegate extends Negate {
 
     public CheckedNegate(MyExpression subExpression) {
         super(subExpression);

@@ -8,7 +8,8 @@ public abstract class MyExpression implements Expression, TripleExpression, BigI
             Priority.MULTIPLY, 2,
             Priority.CONSTANT, 4,
             Priority.VARIABLE, 4,
-            Priority.MINMAX, 0
+            Priority.MINMAX, 0,
+            Priority.POWLOG, 5
     );
     public static final Map<String, Boolean> associative = Map.of(
             "+", true,
@@ -16,7 +17,9 @@ public abstract class MyExpression implements Expression, TripleExpression, BigI
             "*", true,
             "/", false,
             "min", true,
-            "max", true
+            "max", true,
+            "**", false,
+            "//", false
     );
     protected abstract Priority getPriority();
 

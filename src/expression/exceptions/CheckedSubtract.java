@@ -1,11 +1,7 @@
 package expression.exceptions;
 
 import expression.MyExpression;
-import expression.PairMyExpression;
-import expression.Priority;
 import expression.Subtract;
-
-import java.math.BigInteger;
 
 public class CheckedSubtract extends Subtract {
 
@@ -21,6 +17,4 @@ public class CheckedSubtract extends Subtract {
         }
         return firstResult - secondResult;
     }
-
-
 }

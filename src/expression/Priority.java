@@ -5,5 +5,6 @@ public enum Priority {
     MULTIPLY,   // * /
     CONSTANT,
     VARIABLE,
-    MINMAX
+    MINMAX,
+    POWLOG
 }

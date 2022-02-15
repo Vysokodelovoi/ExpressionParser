@@ -51,7 +51,7 @@ public class ExpressionParser extends BaseParser implements Parser {
             if (between('0', '9')) {
                 firstTerm = parseConst(true);
             } else {
-                firstTerm = new UnaryMinus(parseTerm(3));
+                firstTerm = new Negate(parseTerm(3));
             }
         } else if (ch == 'l' || ch == 't') {
           firstTerm = makeUnaryExpression(parseUnaryOperator(), parseTerm(3));
@@ -90,8 +90,7 @@ public class ExpressionParser extends BaseParser implements Parser {
     }
 
     private String parseBinaryOperator() {
-        String op = parseFromSet(binaryOperatorSymbols, binaryOperators);
-        return  op;
+        return parseFromSet(binaryOperatorSymbols, binaryOperators);
     }
 
     private  String parseUnaryOperator() {

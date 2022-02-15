@@ -1,76 +1,114 @@
 package expression.exceptions;
 
 import expression.*;
-import info.kgeorgiy.json.BaseParser;
-import info.kgeorgiy.json.CharSource;
-import info.kgeorgiy.json.StringSource;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class ExpressionParser extends BaseParser implements Parser {
-    private final Set<Character> binaryOperatorSymbols = Set.of('+', '-', '*', '/',  'm', 'i',
-        'n', 'a', 'x');
-    private final Set<Character> unaryOperatorSymbols = Set.of('t','0', 'l');
-    private final Set<String> unaryOperators = Set.of("l0", "t0");
-    private final Set<String> binaryOperators = Set.of("+", "-", "*", "/", "min", "max");
-    private final Map<Character, Integer> priorityByChar = Map.of(
-            '+', 1,
-            '-', 1,
-            '/', 2,
-            '*', 2,
-            'm', 0
+import static expression.exceptions.TokenParser.*;
+import static expression.exceptions.TokenType.*;
+
+public class ExpressionParser implements Parser {
+    private final Map<String, Integer> priorityByOperator = Map.of(
+            "+", 1,
+            "-", 1,
+            "min", 0,
+            "max", 0,
+            "/", 2,
+            "*", 2,
+            "//", 3,
+            "**", 3
     );
+    private final Set<String> whitespacesOperations = Set.of("min", "max");
+    private TokenParser tokenParser;
+
     public ExpressionParser() {
         super();
     }
 
-    protected void initialize(CharSource source) {
-        this.source = source;
-        take();
+    protected void initialize(String source) {
+        tokenParser = new TokenParser(source);
     }
 
     public MyExpression parse(String s) {
-        initialize(new StringSource(s));
+        initialize(s);
         return parseExpression();
     }
 
     private MyExpression parseExpression() {
         MyExpression first;
         first = parseTerm(0);
-        return  first;
+        if (!tokenParser.eof()) {
+            throw new UnexpectedTokenException(tokenParser.nextToken().getSelf());
+        }
+        if (tokenParser.getBalance() > 0) {
+            throw new UnclosedParenthesisException();
+        }
+        if (tokenParser.getBalance() < 0) {
+            throw new UnexpectedTokenException(tokenParser.getCurToken().getSelf());
+
+        }
+        return first;
     }
 
     private MyExpression parseTerm(int priority) {
         MyExpression firstTerm, secondTerm;
-        skipWhitespace();
-        if (take('(')) {
-            firstTerm = parseExpression();
-            take(')');
-        } else if (take('-')) {
-            if (between('0', '9')) {
-                firstTerm = parseConst(true);
-            } else {
-                firstTerm = new CheckedNegate(parseTerm(3));
+        Token curToken = tokenParser.nextNotWhitespace();
+        switch (curToken.getType()) {
+            case LEFT_PARANTH -> {
+                firstTerm = parseTerm(0);
+                tokenParser.nextToken();
             }
-        } else if (ch == 'l' || ch == 't') {
-          firstTerm = makeUnaryExpression(parseUnaryOperator(), parseTerm(3));
-        } else if (between('a', 'z')) {
-            firstTerm = parseVariable();
-        } else {
-            firstTerm = parseConst(false);
+            case VARIABLE -> firstTerm = new Variable(curToken.getSelf());
+            case CONSTANT -> {
+                try {
+                    firstTerm = new Const(Integer.parseInt(curToken.getSelf()));
+                } catch (NumberFormatException exception) {
+                    throw new OverFlowException("constant " + curToken.getSelf(), curToken.getSelf() + "is too long");
+                }
+            }
+            case UNARY -> {
+                if (!curToken.getSelf().equals("-") && !(Character.isWhitespace(tokenParser.getCh()) ||
+                        tokenParser.getCh() == '-' || tokenParser.getCh() == '(')) {
+                    throw new MissingWhitespaceException(curToken.getSelf());
+                }
+                firstTerm = makeUnary(curToken.getSelf(), parseTerm(4));
+            }
+            default -> throw new MissingOperandException(curToken.getSelf());
         }
-        skipWhitespace();
-        while (isPriority(priority)) {
-            String op = parseBinaryOperator();
-            secondTerm = parseTerm(priorityByChar.get(op.charAt(0)) + 1);
-            firstTerm = makeBinaryExpression(firstTerm, secondTerm, op);
+        if (tokenParser.getCurToken().getType() != OPERATOR &&
+                tokenParser.getCurToken().getType() != RIGHT_PARANTH &&
+                tokenParser.nextToken().getType() == WHITESPACE) {
+            tokenParser.nextToken();
+        }
+        while (tokenParser.getCurToken().getType() != RIGHT_PARANTH &&
+                isPriority(tokenParser.getCurToken(), priority)) {
+            String op = tokenParser.getCurToken().getSelf();
+            if (whitespacesOperations.contains(op) && !(tokenParser.getWereWhitespace() &&
+                    (Character.isWhitespace(tokenParser.getCh()) ||
+                            tokenParser.getCh() == '-') ||
+                    tokenParser.getCh() == '(')) {
+                throw new MissingWhitespaceException(op);
+            }
+            secondTerm = parseTerm(priorityByOperator.get(op) + 1);
+            firstTerm = makeBinary(firstTerm, secondTerm, op);
         }
         return firstTerm;
     }
 
-    private MyExpression makeBinaryExpression(MyExpression firstExpression, MyExpression secondExpression, String curOperation) {
+    private boolean isPriority(Token curToken, int priority) {
+        if (curToken.getType() != OPERATOR) {
+            if (curToken.getType() != END && curToken.getType() != RIGHT_PARANTH) {
+                throw new UnexpectedTokenException("operator of end of file expected, found " + curToken.getSelf());
+            }
+            return false;
+        }
+        return priorityByOperator.get(curToken.getSelf()) >= priority;
+    }
+
+    private MyExpression makeBinary(MyExpression firstExpression, MyExpression secondExpression, String curOperation) {
+
         return switch (curOperation) {
             case "+" -> new CheckedAdd(firstExpression, secondExpression);
             case "-" -> new CheckedSubtract(firstExpression, secondExpression);
@@ -78,60 +116,19 @@ public class ExpressionParser extends BaseParser implements Parser {
             case "/" -> new CheckedDivide(firstExpression, secondExpression);
             case "max" -> new Maximum(firstExpression, secondExpression);
             case "min" -> new Minimum(firstExpression, secondExpression);
+            case "**" -> new CheckedPow(firstExpression, secondExpression);
+            case "//" -> new CheckedLog(firstExpression, secondExpression);
             default -> throw new NoSuchElementException("Cannot resolve operation " + curOperation);
         };
     }
 
-    private UnaryExpression makeUnaryExpression(String op, MyExpression subExpression) {
+    private UnaryExpression makeUnary(String op, MyExpression subExpression) {
         return switch (op) {
             case "l0" -> new Nolz(subExpression);
+            case "-" -> new CheckedNegate(subExpression);
             case "t0" -> new Notz(subExpression);
+            case "abs" -> new Abs(subExpression);
             default -> throw new NoSuchElementException("Cannot resolve unary operation " + op);
         };
-    }
-
-    private String parseBinaryOperator() {
-        return parseFromSet(binaryOperatorSymbols, binaryOperators);
-    }
-
-    private  String parseUnaryOperator() {
-        String op = parseFromSet(unaryOperatorSymbols, unaryOperators);
-        if (!unaryOperators.contains(op)) {
-            throw new NoSuchElementException("There is no such binary operation with name " + op);
-        }
-        return op;
-    }
-
-    private String parseFromSet(Set<Character> possibleSymbols, Set<String> possibleTokens) {
-        StringBuilder op = new StringBuilder();
-        while (possibleSymbols.contains(ch)) {
-            op.append(take());
-            if (possibleTokens.contains(op.toString())) {
-                return op.toString();
-            }
-        }
-        return  op.toString();
-    }
-
-    private Const parseConst(boolean isNegative) {
-        StringBuilder constant = new StringBuilder();
-        if (isNegative) {
-            constant.append('-');
-        }
-        while (between('0', '9') ) {
-            constant.append(take());
-        }
-        return new Const(Integer.parseInt(constant.toString()));
-    }
-
-    private Variable parseVariable() {
-        if (between('x', 'z')) {
-            return new Variable(String.valueOf(take()));
-        }
-        return null;
-    }
-
-    private boolean isPriority(int priority) {
-        return priorityByChar.getOrDefault(ch, -1) >= priority;
     }
 }

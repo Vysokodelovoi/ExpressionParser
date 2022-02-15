@@ -6,10 +6,12 @@ package info.kgeorgiy.json;
 public class BaseParser {
     private static final char END = '\0';
     protected CharSource source;
-    protected char ch = 0xffff;
-
+    protected char ch = 0xffff, lastChar = 0xffff;
+    protected boolean skippedWhitespace;
+    private  int position;
     protected BaseParser(final CharSource source) {
         this.source = source;
+        position = 0;
         take();
     }
 
@@ -17,8 +19,11 @@ public class BaseParser {
         source = null;
     }
     protected char take() {
+        lastChar = ch;
         final char result = ch;
         ch = source.hasNext() ? source.next() : END;
+        position++;
+        skippedWhitespace = false;
         return result;
     }
 
@@ -46,7 +51,7 @@ public class BaseParser {
         }
     }
 
-    protected boolean eof() {
+    public boolean eof() {
         return take(END);
     }
 
@@ -61,6 +66,14 @@ public class BaseParser {
     protected void skipWhitespace() {
         while (Character.isWhitespace(ch)) {
             take();
+            skippedWhitespace = true;
         }
+    }
+
+    protected int getPosition() {
+        return position;
+    }
+    protected void setInitialPosition() {
+        position = 0;
     }
 }

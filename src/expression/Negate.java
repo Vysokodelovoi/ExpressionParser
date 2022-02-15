@@ -2,9 +2,9 @@ package expression;
 
 import java.math.BigInteger;
 
-public class UnaryMinus extends UnaryExpression {
+public class Negate extends UnaryExpression {
 
-    public UnaryMinus(MyExpression subExpression) {
+    public Negate(MyExpression subExpression) {
         super(subExpression);
     }
 
@@ -12,6 +12,7 @@ public class UnaryMinus extends UnaryExpression {
     public BigInteger evaluate(BigInteger x) {
         return subExpression.evaluate(x).negate();
     }
+
     @Override
     protected int unaryExpressionEval(int exprResult) {
         return -exprResult;
