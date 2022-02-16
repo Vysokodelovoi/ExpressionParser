@@ -5,6 +5,7 @@ import base.Either;
 import base.ExtendedRandom;
 import base.TestCounter;
 import expression.ToMiniString;
+import expression.exceptions.ExpressionParser;
 import expression.TripleExpression;
 import expression.common.*;
 
